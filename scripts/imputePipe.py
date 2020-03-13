@@ -64,7 +64,7 @@ def phasingCall(filePre, *args):
         raise FileNotFoundError('Check Path scripts/SHAPEIT_ARRAY_TASK_SLURM.sh')
 
 
-def imputeCall(filePre, *args):
+def imputeCall(filePre, ref, *args):
     '''makes the imputation calls with job dependency if applicable to the shapeit call
     '''
     chrSizes = [('1', '249250621'), 
@@ -89,6 +89,11 @@ def imputeCall(filePre, *args):
                 ('19', '59128983'),
                 ('21', '48129895'),
                 ('22', '51304566')]
+    if ref == "3":
+        imputeScript = 'IMPUTE_LOOP_SLURM.sh'
+    else:
+        imputeScript = 'IMPUTE_LOOP_SLURM_Phase1.sh'
+
     if args:
         dependency=args[0]
         if dependency:
@@ -100,7 +105,7 @@ def imputeCall(filePre, *args):
                     chrSize = str(int(chrLength[:2])+1)
                 else:
                     chrSize = str(int(chrLength[:3])+1)
-                impute='./scripts/IMPUTE_LOOP_SLURM.sh {} {} {} {}'.format(chr_, chrSize, filePre, dependency)
+                impute='./scripts/{} {} {} {} {}'.format(imputeScript, chr_, chrSize, filePre, dependency)
                 Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
                 print(impute)
     else:
@@ -111,15 +116,17 @@ def imputeCall(filePre, *args):
                 chrSize = str(int(chrLength[:2])+1)
             else:
                 chrSize = str(int(chrLength[:3])+1)
-            impute='./scripts/IMPUTE_LOOP_SLURM.sh {} {} {}'.format(chr_, chrSize, filePre)
+            impute='./scripts/{} {} {} {}'.format(imputeScript, chr_, chrSize, filePre)
             Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
             print(impute)
             
 def main():
     parser = argparse.ArgumentParser(description='Imputation Pipeline Main')
     parser.add_argument('-F', help='File Prefix for the base BED file unspit by chromosomes', required=True)
+    parser.add_argument('-Ref', help='1000 genomes reference the input should be either 1 or 3', required=True)
     args=parser.parse_args()
     filePre=args.F
+    ref=args.Ref
     plinkFile=checkPath(filePre, fileSuf='bed', chr_='2')
     hapFile=checkPath(filePre, fileSuf='haps', chr_='2')
     if plinkFile: ## if plinkfile exists check for hap file
@@ -128,13 +135,13 @@ def main():
         else:
             job2=phasingCall(filePre)
             if job2:
-                imputeCall(filePre, job2)    
+                imputeCall(filePre, ref, job2)    
     else:
         job1 = plinkSplitCall(filePre)
         if job1:
             job2 = phasingCall(filePre, job1)
             if job2:
-                imputeCall(filePre, job2)
+                imputeCall(filePre, ref, job2)
 
     
 
