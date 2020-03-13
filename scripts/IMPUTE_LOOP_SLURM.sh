@@ -3,6 +3,7 @@
 #2 total length of chr
 #3 file name
 #4 shapeit_jobID
+mkdir -P imputeFiles
 for i in `seq 0 $2` 
 do
 interval=`echo $i'e6 '$(($i +1))'e6'`
