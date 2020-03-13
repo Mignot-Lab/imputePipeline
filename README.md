@@ -1,8 +1,8 @@
-# IMPUTE_PIPELINE_MIGNOT_SLURM_VER
-This pipeline is a slurm version of the IMPUTE_PIPELINE
+# Imputation pipeline used in the mignot lab
+This is slurm job dependent pipeline that takes in base plink format bed files, splits them into chromosomes ( 1 to 22) and then phases them using shapeit, after phasing each chromosome is imputed to 1000 genomes phase 3 in 1mb chunks
 # Dependancies
 plink/1.90
  shapeit
  impute2
 # example command
-```./IMPUTE_PIPELINE_SLURM_v1.sh plink_binary```
+```python imputePipe.py -F plink_binary```
