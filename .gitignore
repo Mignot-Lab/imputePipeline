@@ -16,3 +16,5 @@
 *.irem
 *.mds
 *.snplist
+*summary
+*warnings
