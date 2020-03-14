@@ -3,7 +3,6 @@ from subprocess import Popen, PIPE
 import sys
 import os
 import argparse
-import CONCAT_IMPUTE
 
 
 def checkPath(filePre, fileSuf, chr_):
@@ -131,7 +130,7 @@ def main():
     hapFile=checkPath(filePre, fileSuf='haps', chr_='2')
     if plinkFile: ## if plinkfile exists check for hap file
         if hapFile: ## if hap file exists go to imputation
-            imputeCall(filePre)
+            imputeCall(filePre, ref)
         else:
             job2=phasingCall(filePre)
             if job2:
