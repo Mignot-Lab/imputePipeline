@@ -5,4 +5,4 @@ plink/1.90
  shapeit
  impute2
 # example command
-```python scripts/imputePipe.py -F plink_binary```
+```python scripts/imputePipe.py -F plink_binary -Ref 3```
