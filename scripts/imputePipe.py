@@ -17,11 +17,11 @@ def checkPath(filePre, fileSuf, chr_):
         return False
 
 
-def plinkSplitCall(filePre):
+def plinkSplitCall(filePre, chrNum):
     '''Given a base bed file, this function will submit a job to split files by chromosomes and return a job ID
     '''
     if os.path.exists(os.path.join(os.getcwd(), 'scripts/PLINK_SPLIT_SLURM.sh')):
-        plinKSplit='./scripts/PLINK_SPLIT_SLURM.sh {}'.format(filePre)
+        plinKSplit='./scripts/PLINK_SPLIT_SLURM.sh {} {}'.format(filePre, chrNum)
         plinkCall=Popen(plinKSplit, shell=True, stdout=PIPE, stderr=PIPE)
         stdout, stderr= plinkCall.communicate()
         if not stderr:
@@ -37,16 +37,16 @@ def plinkSplitCall(filePre):
 
 
 
-def phasingCall(filePre, *args):
+def phasingCall(filePre,chrNum, *args):
     '''function to take input as the base plink file prefix and an optional job dependency for slurm
     '''
     if args:
         dependency=args[0]
         if dependency:
             print('Job Dependency {}'.format(dependency))
-            shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {}'.format(filePre, dependency)
+            shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {}'.format(filePre, chrNum, dependency)
     else:
-        shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {}'.format(filePre)
+        shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {}'.format(filePre, chrNum)
     print(shapeIt)
     if os.path.exists(os.path.join(os.getcwd(), 'scripts/SHAPEIT_ARRAY_TASK_SLURM.sh')):
         shapeitCall=Popen(shapeIt, shell=True, stdout=PIPE, stderr=PIPE)
@@ -63,7 +63,7 @@ def phasingCall(filePre, *args):
         raise FileNotFoundError('Check Path scripts/SHAPEIT_ARRAY_TASK_SLURM.sh')
 
 
-def imputeCall(filePre, ref, *args):
+def imputeCall(filePre, ref, chrNum, *args):
     '''makes the imputation calls with job dependency if applicable to the shapeit call
     '''
     chrSizes = [('1', '249250621'), 
@@ -104,9 +104,18 @@ def imputeCall(filePre, ref, *args):
                     chrSize = str(int(chrLength[:2])+1)
                 else:
                     chrSize = str(int(chrLength[:3])+1)
-                impute='./scripts/{} {} {} {} {}'.format(imputeScript, chr_, chrSize, filePre, dependency)
-                Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
-                print(impute)
+                if chrNum == '1-22':
+                    impute='./scripts/{} {} {} {} {}'.format(imputeScript, chr_, chrSize, filePre, dependency)
+                    Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
+                    print(impute)
+                else: ## check if args contain a range of chr
+                    print('CHR RANGE OR SINGLE CHR ARG DETECTED AS {}'.format(chrNum))
+                    if chr_ in chrNum.split(','):
+                        impute='./scripts/{} {} {} {} {}'.format(imputeScript, chr_, chrSize, filePre, dependency)
+                        Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
+                        print(impute)
+                    else:
+                        raise ValueError('Check {} Args'.format(chrNum))
     else:
         for chrTup in chrSizes:
             chr_=chrTup[0]
@@ -115,32 +124,45 @@ def imputeCall(filePre, ref, *args):
                 chrSize = str(int(chrLength[:2])+1)
             else:
                 chrSize = str(int(chrLength[:3])+1)
-            impute='./scripts/{} {} {} {}'.format(imputeScript, chr_, chrSize, filePre)
-            Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
-            print(impute)
+            if chrNum == '1-22':
+                impute='./scripts/{} {} {} {}'.format(imputeScript, chr_, chrSize, filePre)
+                Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
+                print(impute)
+            else: ## check if args contain a range of chr
+                print('CHR RANGE OR SINGLE CHR ARG DETECTED AS {}'.format(chrNum))
+                if chr_ in chrNum.split(','):
+                    impute='./scripts/{} {} {} {}'.format(imputeScript, chr_, chrSize, filePre)
+                    Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
+                    print(impute)
+                else:
+                    raise ValueError('Check {} Args'.format(chrNum))
+            
+            
             
 def main():
     parser = argparse.ArgumentParser(description='Imputation Pipeline Main')
     parser.add_argument('-F', help='File Prefix for the base BED file unspit by chromosomes', required=True)
     parser.add_argument('-Ref', help='1000 genomes reference the input should be either 1 or 3', required=True)
+    parser.add_argument('-CHR', help='Either a chromosome range in the format 1-22 or a single chromsome 1 or a custom range 1,6,7')
     args=parser.parse_args()
     filePre=args.F
     ref=args.Ref
+    chrNum = args.CHR
     plinkFile=checkPath(filePre, fileSuf='bed', chr_='2')
     hapFile=checkPath(filePre, fileSuf='haps', chr_='2')
     if plinkFile: ## if plinkfile exists check for hap file
         if hapFile: ## if hap file exists go to imputation
-            imputeCall(filePre, ref)
+            imputeCall(filePre, ref, chrNum)
         else:
-            job2=phasingCall(filePre)
+            job2=phasingCall(filePre, chrNum)
             if job2:
-                imputeCall(filePre, ref, job2)    
+                imputeCall(filePre, ref, chrNum, job2)    
     else:
-        job1 = plinkSplitCall(filePre)
+        job1 = plinkSplitCall(filePre, chrNum)
         if job1:
-            job2 = phasingCall(filePre, job1)
+            job2 = phasingCall(filePre, chrNum, job1)
             if job2:
-                imputeCall(filePre, ref, job2)
+                imputeCall(filePre, ref, chrNum, job2)
 
     
 

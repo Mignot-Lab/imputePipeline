@@ -11,7 +11,7 @@ cat > shapeit_array.sh <<- EOF
 #SBATCH --job-name=shapeit_array
 #SBATCH --mem-per-cpu=10000
 #SBATCH --time=120:00:00
-#SBATCH --array=1-22
+#SBATCH --array=$2
 #SBATCH --cpus-per-task=4
 #SBATCH --account=mignot
 $command
@@ -22,8 +22,8 @@ cat > shapeit_array.sh <<- EOF
 #SBATCH --job-name=shapeit_array
 #SBATCH --mem-per-cpu=10000
 #SBATCH --time=120:00:00
-#SBATCH --array=1-22
-#SBATCH --depend=afterok:"$2"
+#SBATCH --array=$2
+#SBATCH --depend=afterok:"$3"
 #SBATCH --cpus-per-task=4
 #SBATCH --account=mignot
 $command

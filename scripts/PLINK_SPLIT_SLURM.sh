@@ -7,8 +7,8 @@ cat > PLINK_SPLIT.sh <<- EOF
 #SBATCH --job-name=PLINK_SPLIT_CHR
 #SBATCH --mem-per-cpu=4000
 #SBATCH --time=01:00:00
-#SBATCH --array=1-22
+#SBATCH --array=$2
 #SBATCH --account=mignot
 $command
 EOF
-sbatch --export=ALL PLINK_SPLIT.sh
+#sbatch --export=ALL PLINK_SPLIT.sh
