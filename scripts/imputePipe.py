@@ -26,6 +26,7 @@ def plinkSplitCall(filePre, chrNum):
         stdout, stderr= plinkCall.communicate()
         if not stderr:
             job1 = re.findall(r'\d+', stdout.decode())[0]
+            print(stdout.decode())
             if not job1:
                 exit('Job Submission Unsuccessful for Script {}'.format(plinKSplit))
             else:
@@ -44,7 +45,7 @@ def phasingCall(filePre,chrNum, *args):
         dependency=args[0]
         if dependency:
             print('Job Dependency {}'.format(dependency))
-            shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {}'.format(filePre, chrNum, dependency)
+            shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {} {}'.format(filePre, chrNum, dependency)
     else:
         shapeIt='./scripts/SHAPEIT_ARRAY_TASK_SLURM.sh {} {}'.format(filePre, chrNum)
     print(shapeIt)
@@ -114,8 +115,8 @@ def imputeCall(filePre, ref, chrNum, *args):
                         impute='./scripts/{} {} {} {} {}'.format(imputeScript, chr_, chrSize, filePre, dependency)
                         Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
                         print(impute)
-                    else:
-                        raise ValueError('Check {} Args'.format(chrNum))
+                    # else:
+                    #     raise ValueError('Check {} Args'.format(chrNum))
     else:
         for chrTup in chrSizes:
             chr_=chrTup[0]
@@ -129,13 +130,13 @@ def imputeCall(filePre, ref, chrNum, *args):
                 Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
                 print(impute)
             else: ## check if args contain a range of chr
-                print('CHR RANGE OR SINGLE CHR ARG DETECTED AS {}'.format(chrNum))
                 if chr_ in chrNum.split(','):
+                    print('CHR RANGE OR SINGLE CHR ARG DETECTED AS {}'.format(chrNum))
                     impute='./scripts/{} {} {} {}'.format(imputeScript, chr_, chrSize, filePre)
                     Popen(impute, shell=True, stdout=PIPE, stderr=PIPE)
                     print(impute)
-                else:
-                    raise ValueError('Check {} Args'.format(chrNum))
+                # else:
+                #     raise ValueError('Check {} Args'.format(chrNum))
             
             
             

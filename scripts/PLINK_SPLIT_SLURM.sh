@@ -11,4 +11,4 @@ cat > PLINK_SPLIT.sh <<- EOF
 #SBATCH --account=mignot
 $command
 EOF
-#sbatch --export=ALL PLINK_SPLIT.sh
+sbatch --export=ALL PLINK_SPLIT.sh

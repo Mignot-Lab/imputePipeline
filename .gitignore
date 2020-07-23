@@ -16,6 +16,10 @@
 *.irem
 *.mds
 *.snplist
+*.done
 *summary
 *warnings
+PLINK_SPLIT.sh
+tmp*
+shapeit_array.sh
 imputeFiles/*
