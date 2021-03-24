@@ -1,7 +1,8 @@
 #!/bin/bash
+mkdir -p phasedHaps
 command="./bin/shapeit --input-bed "$1"_CHR\$SLURM_ARRAY_TASK_ID.bed "$1"_CHR\$SLURM_ARRAY_TASK_ID.bim "$1"_CHR\$SLURM_ARRAY_TASK_ID.fam \
 -M /labs/mignot/IMPUTE_REFERENCE_PHASE3/genetic_map_chr\$SLURM_ARRAY_TASK_ID\_combined_b37.txt \
--O "$1"_CHR\$SLURM_ARRAY_TASK_ID \
+-O phasedHaps/"$1"_CHR\$SLURM_ARRAY_TASK_ID \
 -T 8"
 touch shapeit_array.sh
 chmod 755 shapeit_array.sh
