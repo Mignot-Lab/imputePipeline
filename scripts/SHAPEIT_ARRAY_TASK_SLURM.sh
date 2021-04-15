@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir -p phasedHaps
-command="./bin/shapeit --input-bed bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.bed bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.bim "$1"_CHR\$SLURM_ARRAY_TASK_ID.fam \
+command="./bin/shapeit --input-bed bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.bed bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.bim bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.fam \
 -M /labs/mignot/IMPUTE_REFERENCE_PHASE3/genetic_map_chr\$SLURM_ARRAY_TASK_ID\_combined_b37.txt \
 -O phasedHaps/"$1"_CHR\$SLURM_ARRAY_TASK_ID \
 -T 8"
