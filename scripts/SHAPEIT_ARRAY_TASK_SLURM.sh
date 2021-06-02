@@ -6,7 +6,7 @@ command="./bin/shapeit --input-bed bedFiles/"$1"_CHR\$SLURM_ARRAY_TASK_ID.bed be
 -T 8"
 touch shapeit_array.sh
 chmod 755 shapeit_array.sh
-if [[ $2 -eq 0 ]]; then
+if [[ $3 -eq 0 ]]; then
 cat > shapeit_array.sh <<- EOF
 #!/bin/bash -l
 #SBATCH --job-name=shapeit_array
